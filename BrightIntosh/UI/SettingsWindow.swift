@@ -7,7 +7,6 @@
 
 import KeyboardShortcuts
 import OSLog
-import StoreKit
 import SwiftUI
 
 final class BasicSettingsViewModel: ObservableObject {
@@ -75,9 +74,6 @@ struct BasicSettings: View {
     @State private var brightIntoshOnlyOnBuiltIn = Settings.shared.brightIntoshOnlyOnBuiltIn
     @State private var batteryLevelThreshold = Settings.shared.batteryAutomationThreshold
     @State private var timerAutomationTimeout = Settings.shared.timerAutomationTimeout
-
-    @State private var entitledToUnrestrictedUse = false
-    @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
 
     var body: some View {
         ScrollView {
@@ -214,21 +210,13 @@ struct Acknowledgments: View {
 }
 
 struct VersionView: View {
-    #if STORE
-        var title: String = "BrightIntosh SE v\(appVersion)"
-        @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
-    #else
-        var title: String = "BrightIntosh v\(appVersion)"
-        private let isUnrestrictedUser: Bool = true
-    #endif
+    var title: String = "BrightIntosh v\(appVersion)"
 
     @State var clicks = 0
 
-    @State var ignoreAppTransaction = Settings.shared.ignoreAppTransaction
-
     var body: some View {
         VStack {
-            Label(title + (isUnrestrictedUser ? "" : " - Free Trial"), image: "LogoBordered")
+            Label(title, image: "LogoBordered")
                 .imageScale(.small)
                 .onTapGesture {
                     clicks += 1
@@ -259,40 +247,12 @@ struct VersionView: View {
                 .help("X / Twitter")
             }
         }
-        #if STORE
-            if clicks >= 5 {
-                VStack {
-                    Text("Test Settings").font(.title2)
-                    Toggle(isOn: $ignoreAppTransaction) {
-                        Text("Test: Ignore App Transaction")
-                    }
-                    .onChange(of: ignoreAppTransaction) { _ in
-                        Settings.shared.ignoreAppTransaction = ignoreAppTransaction
-                        Task {
-                            _ = await EntitlementHandler.shared.isUnrestrictedUser()
-                        }
-                    }
-                    Button("Hide") {
-                        clicks = 0
-                    }
-                }
-            }
-        #endif
     }
 }
 
 struct SettingsTabs: View {
-    @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
-
     var body: some View {
         TabView {
-            #if STORE
-                if !isUnrestrictedUser {
-                    BrightIntoshStoreView(showTrialExpiredWarning: true).tabItem {
-                        Text("Store")
-                    }
-                }
-            #endif
             BasicSettings().tabItem {
                 Text("General")
             }
@@ -313,7 +273,6 @@ struct SettingsView: View {
             VersionView()
         }
         .padding()
-        .userStatusTask()
     }
 }
 

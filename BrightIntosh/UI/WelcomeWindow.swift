@@ -11,8 +11,6 @@ struct IntroView: View {
     var supportedDevice: Bool = false
     var onAccept: () -> Void
 
-    @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
-
     var body: some View {
         ScrollView {
             VStack(alignment: .center, spacing: 10.0) {
@@ -116,22 +114,13 @@ struct IntroView: View {
 
 struct WelcomeStoreView: View {
     var onContinue: () -> Void
-    var trial: TrialData
-
-    @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
 
     var body: some View {
         VStack {
             VStack {
-                if !trial.stillEntitled() {
-                    Text("Your trial has expired")
-                        .font(.largeTitle)
-                        .bold()
-                } else {
-                    Text("Unleash the Brightness!")
-                        .font(.largeTitle)
-                        .bold()
-                }
+                Text("Unleash the Brightness!")
+                    .font(.largeTitle)
+                    .bold()
             }
             .frame(maxWidth: .infinity)
             .translucentCard()
@@ -143,13 +132,6 @@ struct WelcomeStoreView: View {
             .translucentCard()
 
             Spacer()
-
-            if !isUnrestrictedUser && trial.stillEntitled() && trial.getRemainingDays() > 0 {
-                Button(action: onContinue) {
-                    Text("Start your free \(trial.getRemainingDays()) day trial")
-                }
-                .buttonStyle(BrightIntoshButtonStyle())
-            }
         }
     }
 }
@@ -158,11 +140,6 @@ struct WelcomeView: View {
 
     var supportedDevice: Bool = false
     var closeWindow: () -> Void
-
-    @State var showStore = false
-
-    @Environment(\.trial) private var trial: TrialData?
-    @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
 
     var body: some View {
         VStack {
@@ -177,34 +154,15 @@ struct WelcomeView: View {
                     .bold()
             }
             Spacer()
-            if !showStore {
-                IntroView(
-                    supportedDevice: supportedDevice,
-                    onAccept: {
-#if STORE
-                        if isUnrestrictedUser {
-                            closeWindow()
-                            return
-                        }
-                        showStore = true
-#else
-                        closeWindow()
-#endif
-                    }
-                )
-            } else {
-                if let trial = trial {
-                    WelcomeStoreView(onContinue: closeWindow, trial: trial)
-                } else {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-            }
+            WelcomeStoreView(onContinue: closeWindow)
+            ProgressView()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(20.0)
         .background(LinearGradient.brightIntoshBackground)
     }
 }
+
 
 struct WelcomeView_Previews: PreviewProvider {
     static var previews: some View {
@@ -224,7 +182,6 @@ final class WelcomeWindowController: NSWindowController, NSWindowDelegate {
         )
 
         let contentView = WelcomeView(supportedDevice: supportedDevice, closeWindow: welcomeWindow.close).frame(width: 550, height: 740)
-            .userStatusTask()
 
         welcomeWindow.contentView = NSHostingView(rootView: contentView)
         welcomeWindow.titlebarAppearsTransparent = true

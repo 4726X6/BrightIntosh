@@ -8,7 +8,6 @@
 import Cocoa
 import KeyboardShortcuts
 import ServiceManagement
-import StoreKit
 import CoreSpotlight
 
 
@@ -22,9 +21,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var brightnessManager: BrightnessManager?
     var automationManager: AutomationManager?
     var supportedDevice: Bool = false
-
-
-    private var trialTimer: Timer?
 
     @MainActor
     func application(
@@ -54,46 +50,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             Settings.shared.brightIntoshOnlyOnBuiltIn = false
         }
 
-        brightnessManager = BrightnessManager(isExtraBrightnessAllowed: isExtraBrightnessAllowed)
+        brightnessManager = BrightnessManager()
         automationManager = AutomationManager()
-        statusBarMenu = StatusBarMenu(supportedDevice: supportedDevice, automationManager: automationManager!, settingsWindowController: settingsWindowController, toggleBrightIntosh: toggleBrightIntosh, isExtraBrightnessAllowed: isExtraBrightnessAllowed)
+        statusBarMenu = StatusBarMenu(supportedDevice: supportedDevice, automationManager: automationManager!, settingsWindowController: settingsWindowController, toggleBrightIntosh: toggleBrightIntosh)
 
         // Register global hotkeys
         addKeyListeners()
 
-        Settings.shared.addListener(setting: "brightintoshActive") {
-            if !Settings.shared.brightintoshActive {
-                self.stopTrialTimer()
-            }
-        }
-
-        Task {
-            await isExtraBrightnessAllowed(offerUpgrade: true)
-        }
-
         addSettingsToIndex()
-    }
-
-    func isExtraBrightnessAllowed(offerUpgrade: Bool) async -> Bool {
-#if STORE
-        if await EntitlementHandler.shared.isUnrestrictedUser() {
-            return true
-        }
-        do {
-            let stillEntitledToTrial = (try await TrialData.getTrialData()).stillEntitled()
-            if !stillEntitledToTrial && offerUpgrade {
-                DispatchQueue.main.async {
-                    self.showSettingsWindow()
-                }
-            }
-            startTrialTimer()
-            return stillEntitledToTrial
-        } catch {
-            return false
-        }
-#else
-        return true
-#endif
     }
 
     @objc func increaseBrightness() {
@@ -136,40 +100,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showSettingsWindow() {
         self.settingsWindowController.showWindow(nil)
-    }
-
-    func startTrialTimer() {
-        if trialTimer != nil {
-            return
-        }
-        // check every 5min
-        trialTimer = Timer(timeInterval: 300, repeats: true, block: {t in self.revalidateTrial()})
-        RunLoop.main.add(self.trialTimer!, forMode: RunLoop.Mode.common)
-    }
-
-    func revalidateTrial() {
-        if !Settings.shared.brightintoshActive {
-            stopTrialTimer()
-            return
-        }
-        Task {
-            if !(await self.isExtraBrightnessAllowed(offerUpgrade: true)) {
-                // turn brightintosh off if user is not entitled
-                DispatchQueue.main.async {
-                    Settings.shared.brightintoshActive = false
-                }
-            } else {
-                stopTrialTimer()
-            }
-        }
-    }
-
-    func stopTrialTimer() {
-        if trialTimer == nil {
-            return
-        }
-        self.trialTimer?.invalidate()
-        self.trialTimer = nil
     }
 
 

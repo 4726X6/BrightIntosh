@@ -2,6 +2,7 @@
   "sourceLanguage" : "en",
   "strings" : {
     "[Privacy Policy](https://brightintosh.de/app_privacy_policy_en.html)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -36,6 +37,7 @@
       }
     },
     "[Terms](https://www.apple.com/legal/internet-services/itunes/dev/stdeula/)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -490,6 +492,7 @@
       }
     },
     "Buy %@%@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1000,6 +1003,7 @@
       }
     },
     "Hide" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1258,6 +1262,7 @@
       }
     },
     "Start your free %lld day trial" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1326,6 +1331,7 @@
       }
     },
     "Test Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1336,6 +1342,7 @@
       }
     },
     "Test: Ignore App Transaction" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1346,6 +1353,7 @@
       }
     },
     "There seems to be an issue with the store connection. Please check your internet connection or try restarting you MacBook." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1551,6 +1559,7 @@
       }
     },
     "Unlock unrestricted access to BrightIntosh" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1741,6 +1750,7 @@
       }
     },
     "Your trial has expired" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1775,6 +1785,7 @@
       }
     },
     "Your trial has expired. Unlock unrestricted access to BrightIntosh" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
