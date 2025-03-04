@@ -235,16 +235,6 @@ struct VersionView: View {
                     }
                 )
                 .help("Help")
-                Button(action: {
-                    NSWorkspace.shared.open(BrightIntoshUrls.twitter)
-                }) {
-                    Image("X")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 16, height: 16)
-                        .padding(4.0)
-                }
-                .help("X / Twitter")
             }
         }
     }

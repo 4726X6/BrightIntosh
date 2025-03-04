@@ -1594,21 +1594,12 @@
       }
     },
     "X" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "X"
-          }
-        }
-      }
-    },
-    "X / Twitter" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "X / Twitter"
           }
         }
       }

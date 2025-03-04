@@ -10,10 +10,8 @@ import KeyboardShortcuts
 import SwiftUI
 
 struct BrightIntoshUrls {
-    static let web = URL(string: "https://brightintosh.de")!
-    static let twitter = URL(string: "https://x.com/BrightIntoshApp")!
-    static let help = URL(string: "https://brightintosh.de#faq")!
-    static let time = URL(string: "https://brightintosh.de/time.php")!
+    static let web = URL(string: "https://github.com/ijsbol/BrightIntosh-NoPremium")!
+    static let help = URL(string: "https://github.com/ijsbol/BrightIntosh-NoPremium")!
     static let legal = URL(string: "https://brightintosh.de/legal_notice.html")!
 }
 
