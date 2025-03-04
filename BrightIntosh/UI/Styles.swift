@@ -19,7 +19,7 @@ extension LinearGradient {
 
 struct BrightIntoshButtonStyle: ButtonStyle {
     public var backgroundColor: Color = .brightintoshBlue
-    
+
     func makeBody(configuration: Self.Configuration) -> some View {
         configuration.label
             .padding(10.0)
@@ -33,7 +33,7 @@ struct BrightIntoshButtonStyle: ButtonStyle {
 private struct CardModifier: ViewModifier {
     public var backgroundColor: Color
     public var opacity: Double
-    
+
     func body(content: Content) -> some View {
         content
             .foregroundStyle(.black)

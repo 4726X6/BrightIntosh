@@ -13,19 +13,19 @@ import CoreSpotlight
 
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    
+
     private var overlayAvailable: Bool = false
-    
+
     let settingsWindowController = SettingsWindowController()
-    
+
     var statusBarMenu: StatusBarMenu?
     var brightnessManager: BrightnessManager?
     var automationManager: AutomationManager?
     var supportedDevice: Bool = false
 
-    
+
     private var trialTimer: Timer?
-    
+
     @MainActor
     func application(
         _ application: NSApplication,
@@ -41,39 +41,39 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         return false
     }
-    
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        
+
         supportedDevice = isDeviceSupported()
-        
+
         if UserDefaults.standard.object(forKey: "agreementAccepted") == nil || !UserDefaults.standard.bool(forKey: "agreementAccepted") {
             welcomeWindow()
         }
-        
+
         if !supportedDevice {
             Settings.shared.brightIntoshOnlyOnBuiltIn = false
         }
-        
+
         brightnessManager = BrightnessManager(isExtraBrightnessAllowed: isExtraBrightnessAllowed)
         automationManager = AutomationManager()
         statusBarMenu = StatusBarMenu(supportedDevice: supportedDevice, automationManager: automationManager!, settingsWindowController: settingsWindowController, toggleBrightIntosh: toggleBrightIntosh, isExtraBrightnessAllowed: isExtraBrightnessAllowed)
-        
+
         // Register global hotkeys
         addKeyListeners()
-        
+
         Settings.shared.addListener(setting: "brightintoshActive") {
             if !Settings.shared.brightintoshActive {
                 self.stopTrialTimer()
             }
         }
-        
+
         Task {
             await isExtraBrightnessAllowed(offerUpgrade: true)
         }
-        
+
         addSettingsToIndex()
     }
-    
+
     func isExtraBrightnessAllowed(offerUpgrade: Bool) async -> Bool {
 #if STORE
         if await EntitlementHandler.shared.isUnrestrictedUser() {
@@ -95,15 +95,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
 #endif
     }
-    
+
     @objc func increaseBrightness() {
         Settings.shared.brightness = min(getDeviceMaxBrightness(), Settings.shared.brightness + 0.05)
     }
-    
+
     @objc func decreaseBrightness() {
         Settings.shared.brightness = max(1.0, Settings.shared.brightness - 0.05)
     }
-    
+
     func addKeyListeners() {
         KeyboardShortcuts.onKeyUp(for: .toggleBrightIntosh) {
             self.toggleBrightIntosh()
@@ -118,26 +118,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.showSettingsWindow()
         })
     }
-    
+
     @objc func toggleBrightIntosh() {
         if !Settings.shared.brightintoshActive && !checkBatteryAutomationContradiction() {
             return
         }
-        
+
         Settings.shared.brightintoshActive.toggle()
     }
-    
+
     func welcomeWindow() {
         NSApplication.shared.activate(ignoringOtherApps: true)
         let controller = WelcomeWindowController(supportedDevice: supportedDevice)
         NSApp.runModal(for: controller.window!)
         UserDefaults.standard.set(true, forKey: "agreementAccepted")
     }
-    
+
     func showSettingsWindow() {
         self.settingsWindowController.showWindow(nil)
     }
-    
+
     func startTrialTimer() {
         if trialTimer != nil {
             return
@@ -146,7 +146,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         trialTimer = Timer(timeInterval: 300, repeats: true, block: {t in self.revalidateTrial()})
         RunLoop.main.add(self.trialTimer!, forMode: RunLoop.Mode.common)
     }
-    
+
     func revalidateTrial() {
         if !Settings.shared.brightintoshActive {
             stopTrialTimer()
@@ -163,7 +163,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
     }
-    
+
     func stopTrialTimer() {
         if trialTimer == nil {
             return
@@ -172,7 +172,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         self.trialTimer = nil
     }
 
-    
+
     func addSettingsToIndex() {
         let attributeSet = CSSearchableItemAttributeSet(contentType: UTType.application)
         attributeSet.title = NSLocalizedString("BrightIntosh Settings", comment: "")
@@ -181,7 +181,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         attributeSet.alternateNames = ["BrightIntosh Settings", "BrightIntosh", "Settings", "brightness"]
 
         let item = CSSearchableItem(uniqueIdentifier: "de.brightintosh.app.settings", domainIdentifier: "de.brightintosh.app", attributeSet: attributeSet)
-        
+
         CSSearchableIndex.default().indexSearchableItems([item]) { error in
             if error != nil {
                 print(error?.localizedDescription ?? "An error occured while indexing the item.")

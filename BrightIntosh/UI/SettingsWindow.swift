@@ -69,7 +69,7 @@ final class BasicSettingsViewModel: ObservableObject {
 
 struct BasicSettings: View {
     @ObservedObject var viewModel = BasicSettingsViewModel()
-    
+
     @State private var hideMenuBarItem = Settings.shared.hideMenuBarItem
     @State private var launchOnLogin = Settings.shared.launchAtLogin
     @State private var brightIntoshOnlyOnBuiltIn = Settings.shared.brightIntoshOnlyOnBuiltIn

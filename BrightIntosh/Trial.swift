@@ -38,25 +38,25 @@ extension Date {
 public struct TrialData {
     let purchaseDate: Date
     let currentDate: Date
-    
+
     func getRemainingDays() -> Int {
         if let expirationDate = getExpirationDate(), currentDate < expirationDate {
             return Calendar.current.dateComponents([.year, .month, .day], from: currentDate, to: expirationDate).day ?? 0
         }
         return 0
     }
-    
+
     private func getExpirationDate() -> Date? {
         return Calendar.current.date(byAdding: .day, value: 3, to: purchaseDate)
     }
-    
+
     func stillEntitled() -> Bool {
         if let expirationDate = getExpirationDate() {
             return currentDate < expirationDate
         }
         return false
     }
-    
+
     static func getTrialData() async throws -> TrialData {
         do {
             let shared = try await AppTransaction.shared

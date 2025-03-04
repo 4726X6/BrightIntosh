@@ -34,9 +34,9 @@ public extension EnvironmentValues {
 private struct UserStatusTaskModifier: ViewModifier {
     @State var unrestrictedUser = false
     @State var trial: TrialData? = nil
-    
+
     @ObservedObject var entitlementHandler = EntitlementHandler.shared
-    
+
     func body(content: Content) -> some View {
         content
             .task {

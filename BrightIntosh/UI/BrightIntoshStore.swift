@@ -25,22 +25,22 @@ struct InfoNote: View {
 struct BrightIntoshStoreView: View {
     public var showLogo: Bool = true
     public var showTrialExpiredWarning: Bool = true
-    
+
     private let logger = Logger(
         subsystem: "Settings View",
         category: "Store"
     )
-    
+
     @ObservedObject private var storeManager = StoreManager()
     @ObservedObject private var entitlementHandler = EntitlementHandler.shared
-    
+
     @State var purchaseCompleted = false
-        
+
     @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
     @Environment(\.trial) private var trial: TrialData?
 
     @State private var showRestartNoteDueToSpinner = false
-    
+
     @State private var restoreAttempts = 0
 
     var body: some View {
@@ -68,7 +68,7 @@ struct BrightIntoshStoreView: View {
                             Text(product.localizedTitle)
                                 .bold()
                                 .font(.title)
-                            
+
                             if showTrialExpiredWarning && trial != nil && !trial!.stillEntitled() {
                                 Text("Your trial has expired. Unlock unrestricted access to BrightIntosh")
                                     .font(.title2)
@@ -133,7 +133,7 @@ struct BrightIntoshStoreView: View {
             showRestartNoteDueToSpinner = false
         }
     }
-    
+
     private func delayNotLoadingRestartNote() async {
         do {
             try await Task.sleep(nanoseconds: 6_000_000_000)

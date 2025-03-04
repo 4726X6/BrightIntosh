@@ -20,11 +20,11 @@ class EntitlementHandler: ObservableObject {
         subsystem: "Store Handler",
         category: "Transaction Processing"
     )
-    
+
     public static let shared = EntitlementHandler()
-    
+
     @Published public var isUnrestrictedUser: Bool = false
-    
+
     func verifyEntitlement(transaction verificationResult: VerificationResult<Transaction>) async -> Bool {
         do {
             let unsafeTransaction = verificationResult.unsafePayloadValue
@@ -33,7 +33,7 @@ class EntitlementHandler: ObservableObject {
             \(unsafeTransaction.productID)
             """)
         }
-        
+
         let transaction: Transaction
         switch verificationResult {
         case .verified(let t):
@@ -48,23 +48,23 @@ class EntitlementHandler: ObservableObject {
             """)
             return false
         }
-        
+
         logger.info("User is entitled to have the product \(transaction.productID)")
         return true
     }
-    
+
     func isUnrestrictedUser(refresh: Bool = false) async -> Bool {
         if !Settings.shared.ignoreAppTransaction && isUnrestrictedUser {
             return true
         }
-        
+
         if await checkAppEntitlements(refresh: refresh) {
             DispatchQueue.main.async {
                 self.isUnrestrictedUser = true
             }
             return true
         }
-        
+
         for await entitlement in Transaction.currentEntitlements {
             if entitlement.unsafePayloadValue.productID == Products.unrestrictedBrightIntosh,
                await self.verifyEntitlement(transaction: entitlement) {
@@ -79,12 +79,12 @@ class EntitlementHandler: ObservableObject {
         }
         return false
     }
-    
+
     func checkAppEntitlements(refresh: Bool = false) async -> Bool {
         if Settings.shared.ignoreAppTransaction {
             return false
         }
-            
+
         do {
             let shared = if refresh {
                 try await AppTransaction.refresh()
@@ -104,7 +104,7 @@ class EntitlementHandler: ObservableObject {
                     return true
                 }
             }
-            
+
         } catch {
             logger.error("Fetching app transaction failed")
         }

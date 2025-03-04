@@ -13,7 +13,7 @@ struct RestorePurchasesButton: View {
     public let label: String
     public let action: () async -> ()
     @State private var isRestoring = false
-    
+
     var body: some View {
         Button(action: {
             isRestoring = true
@@ -32,7 +32,7 @@ struct RestorePurchasesButton: View {
         .buttonStyle(BrightIntoshButtonStyle(backgroundColor: .gray))
         .disabled(isRestoring)
     }
-    
+
 }
 
 #Preview {

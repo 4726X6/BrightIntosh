@@ -10,9 +10,9 @@ import SwiftUI
 struct IntroView: View {
     var supportedDevice: Bool = false
     var onAccept: () -> Void
-    
+
     @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
-    
+
     var body: some View {
         ScrollView {
             VStack(alignment: .center, spacing: 10.0) {
@@ -51,7 +51,7 @@ struct IntroView: View {
                                 .frame(width: 25.0, height: 25.0)
                                 .foregroundColor(.brightintoshBlue)
                             Spacer()
-                            
+
                         }
                         HStack(alignment: .top) {
                             Spacer()
@@ -84,13 +84,13 @@ struct IntroView: View {
                         )
                         .frame(maxWidth: .infinity)
                         .translucentCard()
-                        
+
                         Label("You can also use the \(Image(systemName: "magnifyingglass")) Spotlight Search to open the settings window by searching \"BrightIntosh Settings\"",
                               systemImage: "info.circle")
                         .frame(maxWidth: .infinity)
                         .translucentCard()
                     }
-                    
+
                     VStack(alignment: .leading, spacing: 10.0) {
                         Text("Disclaimer")
                             .bold()
@@ -102,9 +102,9 @@ struct IntroView: View {
                     .foregroundStyle(.black)
                     .translucentCard()
                 }.padding(20.0)
-                
+
                 Spacer()
-                
+
                 Button(action: onAccept) {
                     Text("Accept")
                 }
@@ -117,9 +117,9 @@ struct IntroView: View {
 struct WelcomeStoreView: View {
     var onContinue: () -> Void
     var trial: TrialData
-    
+
     @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
-    
+
     var body: some View {
         VStack {
             VStack {
@@ -135,15 +135,15 @@ struct WelcomeStoreView: View {
             }
             .frame(maxWidth: .infinity)
             .translucentCard()
-            
+
             VStack {
                 BrightIntoshStoreView(showLogo: false)
             }
             .frame(maxWidth: .infinity)
             .translucentCard()
-            
+
             Spacer()
-            
+
             if !isUnrestrictedUser && trial.stillEntitled() && trial.getRemainingDays() > 0 {
                 Button(action: onContinue) {
                     Text("Start your free \(trial.getRemainingDays()) day trial")
@@ -155,15 +155,15 @@ struct WelcomeStoreView: View {
 }
 
 struct WelcomeView: View {
-    
+
     var supportedDevice: Bool = false
     var closeWindow: () -> Void
-    
+
     @State var showStore = false
-   
+
     @Environment(\.trial) private var trial: TrialData?
     @Environment(\.isUnrestrictedUser) private var isUnrestrictedUser: Bool
-    
+
     var body: some View {
         VStack {
             HStack {
@@ -179,7 +179,7 @@ struct WelcomeView: View {
             Spacer()
             if !showStore {
                 IntroView(
-                    supportedDevice: supportedDevice, 
+                    supportedDevice: supportedDevice,
                     onAccept: {
 #if STORE
                         if isUnrestrictedUser {
@@ -215,36 +215,36 @@ struct WelcomeView_Previews: PreviewProvider {
 
 final class WelcomeWindowController: NSWindowController, NSWindowDelegate {
     init(supportedDevice: Bool) {
-        
+
         let welcomeWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 580, height: 740),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
         )
-        
+
         let contentView = WelcomeView(supportedDevice: supportedDevice, closeWindow: welcomeWindow.close).frame(width: 550, height: 740)
             .userStatusTask()
-        
+
         welcomeWindow.contentView = NSHostingView(rootView: contentView)
         welcomeWindow.titlebarAppearsTransparent = true
         welcomeWindow.titlebarSeparatorStyle = .none
         welcomeWindow.titleVisibility = .hidden
         welcomeWindow.styleMask = [.closable, .titled, .fullSizeContentView]
         welcomeWindow.center()
-        
+
         super.init(window: welcomeWindow)
         welcomeWindow.delegate = self
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func windowDidBecomeKey(_ notification: Notification) {
         window?.level = .statusBar
     }
-    
+
     func windowWillClose(_ notification: Notification) {
         NSApp.stopModal()
     }

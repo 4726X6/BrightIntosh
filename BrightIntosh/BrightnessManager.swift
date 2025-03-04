@@ -15,18 +15,18 @@ extension NSScreen {
 }
 
 class BrightnessManager {
-    
+
     var brightnessTechnique: BrightnessTechnique?
     var screens: [NSScreen] = []
     var xdrScreens: [NSScreen] = []
-    
+
     init(isExtraBrightnessAllowed: @escaping (Bool) async -> Bool) {
         setBrightnessTechnique()
-        
+
         if Settings.shared.brightintoshActive {
             enableExtraBrightness()
         }
-        
+
         // Observe displays
         NotificationCenter.default.addObserver(
             self,
@@ -34,7 +34,7 @@ class BrightnessManager {
             name: NSApplication.didChangeScreenParametersNotification,
             object: nil
         )
-        
+
         // Observe workspace for wake notification
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
@@ -42,13 +42,13 @@ class BrightnessManager {
             name: NSWorkspace.screensDidWakeNotification,
             object: nil
         )
-        
+
         // Add settings listeners
         Settings.shared.addListener(setting: "brightintoshActive") {
             print("Toggled increased brightness. Active: \(Settings.shared.brightintoshActive)")
-            
+
             if Settings.shared.brightintoshActive {
-                
+
                 Task {
                     if await isExtraBrightnessAllowed(true) {
                         DispatchQueue.main.async {
@@ -64,36 +64,36 @@ class BrightnessManager {
                 self.brightnessTechnique?.disable()
             }
         }
-        
+
         Settings.shared.addListener(setting: "brightness") {
             print("Set brightness to \(Settings.shared.brightness)")
             self.brightnessTechnique?.adjustBrightness()
         }
-        
+
         Settings.shared.addListener(setting: "brightIntoshOnlyOnBuiltIn") {
             self.handlePotentialScreenUpdate()
         }
-        
+
         screens = getXDRDisplays()
     }
-    
+
     func setBrightnessTechnique() {
         brightnessTechnique?.disable()
         brightnessTechnique = GammaTechnique()
         print("Activated Gamma Technique")
     }
-    
+
     @objc func handleScreenParameters(notification: Notification) {
         handlePotentialScreenUpdate()
     }
-    
+
     @objc func screensWake(notification: Notification) {
         print("Wake up \(notification.name)")
         if let brightnessTechnique = brightnessTechnique, brightnessTechnique.isEnabled {
             brightnessTechnique.adjustBrightness()
         }
     }
-    
+
     func handlePotentialScreenUpdate() {
         let newScreens = NSScreen.screens
         let newXdrDisplays = getXDRDisplays()
@@ -107,13 +107,13 @@ class BrightnessManager {
                 }
             }
         }
-        
+
         if changedScreens {
             print("Screen setup changed")
             screens = newScreens
             xdrScreens = newXdrDisplays
         }
-        
+
         if !newScreens.isEmpty {
             if let brightnessTechnique = brightnessTechnique, Settings.shared.brightintoshActive {
                 if !brightnessTechnique.isEnabled {
@@ -130,11 +130,11 @@ class BrightnessManager {
             self.brightnessTechnique?.disable()
         }
     }
-    
+
     func enableExtraBrightness() {
         // Put brightness value into device specific bounds, as earlier versions allowed storing higher brightness values.
         let safeBrightness = max(1.0, min(getDeviceMaxBrightness(), Settings.shared.brightness))
-        
+
         if safeBrightness != Settings.shared.brightness {
             print("Fixing brightness")
             Settings.shared.brightness = safeBrightness

@@ -8,15 +8,15 @@
 import Cocoa
 
 class OverlayWindow: NSWindow {
-    
+
     var overlay: Overlay?
     var fullsize: Bool
-    
+
     init(fullsize: Bool = false) {
         self.fullsize = fullsize
         let rect = NSRect(x: 0, y: 0, width: 1, height: 1)
-        
-        
+
+
         if fullsize {
             super.init(contentRect: rect, styleMask: [.fullSizeContentView, .borderless], backing: .buffered, defer: false)
             if #available(macOS 13.0, *) {
@@ -34,7 +34,7 @@ class OverlayWindow: NSWindow {
             isReleasedWhenClosed = false
             alphaValue = 1
         }
-        
+
         isOpaque = false
         hasShadow = false
         backgroundColor = NSColor.clear
@@ -42,14 +42,14 @@ class OverlayWindow: NSWindow {
         isReleasedWhenClosed = false
         hidesOnDeactivate = false
     }
-    
+
     func addMetalOverlay(screen: NSScreen) {
         overlay = Overlay(frame: frame, multiplyCompositing: self.fullsize)
         overlay?.screenUpdate(screen: screen)
         overlay?.autoresizingMask = [.width, .height]
         contentView = overlay
     }
-    
+
     func screenUpdate(screen: NSScreen) {
         overlay?.screenUpdate(screen: screen)
     }
@@ -58,35 +58,35 @@ class OverlayWindow: NSWindow {
 final class OverlayWindowController: NSWindowController, NSWindowDelegate {
     let fullsize: Bool
     public let screen: NSScreen
-    
+
     init(screen: NSScreen, fullsize: Bool = false) {
         self.screen = screen
         self.fullsize = fullsize
         let overlayWindow = OverlayWindow(fullsize: fullsize)
-        
+
         super.init(window: overlayWindow)
         overlayWindow.delegate = self
     }
-    
+
     func open(rect: NSRect) {
         guard let window = self.window as? OverlayWindow else {
             return
         }
         window.setFrame(rect, display: true)
-        
-        
+
+
         if !fullsize {
             reposition(screen: screen)
         }
-        
+
         window.orderFrontRegardless()
         window.addMetalOverlay(screen: screen)
     }
-    
+
     func reposition(screen: NSScreen) {
         window?.setFrameOrigin(getIdealPosition(screen: screen))
     }
-    
+
     func getIdealPosition(screen: NSScreen) -> CGPoint {
         var position = screen.frame.origin
         if isBuiltInScreen(screen: screen) {
@@ -95,11 +95,11 @@ final class OverlayWindowController: NSWindowController, NSWindowDelegate {
         position.y += screen.frame.height - 1
         return position
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func windowDidMove(_ notification: Notification) {
         if let window = window, let screen = window.screen {
             if window.frame.origin != getIdealPosition(screen: screen) {
