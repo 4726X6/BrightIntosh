@@ -1,3 +1,5 @@
+> [!IMPORTANT]
+> This is usually a paid tool with a limited free trial. This fork removes all pay requirements, free trials, and unnecessary external API calls - improving user privacy.
 
 # BrightIntosh (No Premium)
 
