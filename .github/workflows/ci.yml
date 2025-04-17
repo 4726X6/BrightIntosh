@@ -1,0 +1,24 @@
+on:
+  push:
+
+name: ci
+
+jobs:
+  build:
+    name: build
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: xcodebuild -scheme BrightIntosh -configuration Release -derivedDataPath ./build
+
+      - run: mkdir app
+      - run: mv ./build/Build/Products/Release/BrightIntosh.app app
+
+      - run: hdiutil create -fs HFS+ -srcfolder app -volname BrightIntosh BrightIntosh.dmg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BrightIntosh.dmg
+          path: BrightIntosh.dmg
